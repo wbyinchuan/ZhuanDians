@@ -20,7 +20,7 @@
         tl:tl_bar_color="#ffffff"
         tl:tl_indicator_color="@android:color/holo_orange_dark"
         tl:tl_indicator_corner_radius="8dp"
-        tl:tl_tab_padding="10dp"/>
+        tl:tl_tab_padding="20dp"/>
 
     <LinearLayout
         android:layout_width="wrap_content"

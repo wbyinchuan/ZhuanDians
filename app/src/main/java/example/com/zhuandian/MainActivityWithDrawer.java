@@ -36,7 +36,7 @@ public class MainActivityWithDrawer extends ToolBarWithDrawerBaseActivity {
     @BindView(R.id.bt_op_nav)
     ImageView bt_op_nav;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
-    String[] titles = {"优惠", "分享", "任务"};
+    String[] titles = {"优惠", "分享"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

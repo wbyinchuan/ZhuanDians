@@ -1,5 +1,6 @@
 package example.com.zhuandian;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
@@ -12,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -37,6 +39,7 @@ public class MainActivityWithDrawer extends ToolBarWithDrawerBaseActivity {
     ImageView bt_op_nav;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
     String[] titles = {"优惠", "分享"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,24 +49,56 @@ public class MainActivityWithDrawer extends ToolBarWithDrawerBaseActivity {
         initData();
     }
 
-
     private void initViews() {
 
         //初始化RecyclerView
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-        MyAdapter myAdapter = new MyAdapter(MainActivityWithDrawer.this);
+        DrawerListAdapter drawerListAdapter = new DrawerListAdapter(MainActivityWithDrawer.this);
 
-        mRecyclerView.setAdapter(myAdapter);
+        //初始化drawer
+        mRecyclerView.setAdapter(drawerListAdapter);
         View header = LayoutInflater.from(this).inflate(R.layout.nav_header, mRecyclerView, false);
-        myAdapter.addHeader(header);
-        myAdapter.setOnItemClickListener((parent, view, position, id) -> closeDrawer());
+        drawerListAdapter.addHeader(header);
+        drawerListAdapter.setOnItemClickListener(
+                new DrawerListAdapter.DrawerListOnItemClickListener() {
+                    @Override
+                    public void onPersonImageClick(View view) {
+                        gotoActivity(view, PersonMsgActivity.class);
+                    }
+
+                    @Override
+                    public void onEmalImageClick(View view) {
+                        gotoActivity(view,EmailMsgActivity.class);
+                    }
+
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        switch (position) {
+                            case 1:
+                                gotoActivity(view, MyOrderActivity.class);
+                                break;
+                            default:
+                        }
+                    }
+                }
+        );
 
         TextView nav_foot_left = initNavFootView(R.id.nav_foot_left, "设置", R.drawable.my_setting);
         TextView nav_foot_right = initNavFootView(R.id.nav_foot_right, "帮助", R.drawable.my_help);
 
-        nav_foot_left.setOnClickListener((v)->{});
-        nav_foot_right.setOnClickListener((v)->{});
+        nav_foot_left.setOnClickListener((v) -> {
+        });
+        nav_foot_right.setOnClickListener((v) -> {
+        });
+    }
+
+    private void gotoActivity(View view,  Class<?> cls) {
+        view.postDelayed(() -> {
+            Intent intent = new Intent(MainActivityWithDrawer.this, cls);
+            startActivity(intent);
+        },250);
+        closeDrawer();
     }
 
     private TextView initNavFootView(@IdRes int id, String text, @DrawableRes int my_setting) {
@@ -77,13 +112,13 @@ public class MainActivityWithDrawer extends ToolBarWithDrawerBaseActivity {
 
     private void initData() {
 
-        bt_op_nav.setOnClickListener((v)-> openDrawer());
+        bt_op_nav.setOnClickListener((v) -> openDrawer());
 
         tabLayout.setTabData(titles);
         //初始化Fragments数组
-        for (String title : titles) {
-            mFragments.add(ContentFragment.newInstance(title));
-        }
+        mFragments.add(ContentYhFragment.newInstance(titles[0]));
+        mFragments.add(ContentFxFragment.newInstance(titles[1]));
+
         //绑定ViewPager
         viewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

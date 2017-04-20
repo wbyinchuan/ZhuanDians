@@ -6,9 +6,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.baronzhang.android.library.adapter.BaseRecyclerViewAdapter;
+import com.baronzhang.android.library.util.ViewFindUtils;
+import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +25,7 @@ import butterknife.ButterKnife;
  * Created by yinchuan on 2017/4/14.
  */
 
-public class MyAdapter extends BaseRecyclerViewAdapter {
+public class DrawerListAdapter extends BaseRecyclerViewAdapter {
 
     private final int HEADER_TYPE = 0;
     private final int NORMAL_TYPE = 1;
@@ -29,7 +33,6 @@ public class MyAdapter extends BaseRecyclerViewAdapter {
 
     private int[] drawables = {
             R.drawable.my_order,
-            R.drawable.my_task,
             R.drawable.my_share,
             R.drawable.my_collection,
             R.drawable.my_bill,
@@ -41,9 +44,9 @@ public class MyAdapter extends BaseRecyclerViewAdapter {
 
     private Context context;
 
-    MyAdapter(Context context) {
+    DrawerListAdapter(Context context) {
         this.context = context;
-        String[] dt = {"我的订单", "我的任务",
+        String[] dt = {"我的订单",
                 "我的分享", "我的收藏", "我的账单", "我的收益", "邀请好友"};
         Collections.addAll(data, dt);
     }
@@ -73,7 +76,8 @@ public class MyAdapter extends BaseRecyclerViewAdapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (position == 0) {
+        if (getItemViewType(position) == HEADER_TYPE) {
+            initDrawerHeader();
             return;
         }
         if (holder instanceof ViewHolderNormal) {
@@ -84,6 +88,24 @@ public class MyAdapter extends BaseRecyclerViewAdapter {
             drawable_left.setBounds(0, 0, drawable_left.getMinimumWidth(), drawable_left.getMinimumHeight());
             tv.setCompoundDrawables(drawable_left, null, null, null);
         }
+    }
+
+    private void initDrawerHeader() {
+        CircularImageView circularImageView = ViewFindUtils.find(header, R.id.circularImageView);
+        circularImageView.setOnClickListener(v -> {
+            if (onItemClickListener instanceof DrawerListOnItemClickListener) {
+                ((DrawerListOnItemClickListener) onItemClickListener).
+                        onPersonImageClick(v);
+            }
+        });
+
+        ImageButton ibEmail = ViewFindUtils.find(header, R.id.iv_email);
+        ibEmail.setOnClickListener(v -> {
+            if (onItemClickListener instanceof DrawerListOnItemClickListener) {
+                ((DrawerListOnItemClickListener) onItemClickListener).
+                        onEmalImageClick(v);
+            }
+        });
     }
 
     @Override
@@ -99,17 +121,22 @@ public class MyAdapter extends BaseRecyclerViewAdapter {
         notifyItemInserted(0);
     }
 
-
-
     static class ViewHolderNormal extends RecyclerView.ViewHolder {
         @BindView(R.id.item)
         TextView tv;
 
-        public ViewHolderNormal(View itemView, MyAdapter adapter) {
+        public ViewHolderNormal(View itemView, DrawerListAdapter adapter) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener((v) -> adapter.onItemHolderClick(this));
         }
 
     }
+
+    interface DrawerListOnItemClickListener extends AdapterView.OnItemClickListener {
+        void onPersonImageClick(View view);
+
+        void onEmalImageClick(View view);
+    }
+
 }

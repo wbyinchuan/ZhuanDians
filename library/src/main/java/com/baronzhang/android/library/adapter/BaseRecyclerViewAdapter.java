@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 public abstract class BaseRecyclerViewAdapter<T extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<T>{
 
     protected AdapterView.OnItemClickListener onItemClickListener;
+  //  protected View header;
 
     public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
 
@@ -24,5 +25,10 @@ public abstract class BaseRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
             throw new IllegalStateException("Please call setOnItemClickListener method set the click event listeners");
         }
     }
+
+//    public void addHeader(View headerView) {
+//        header = headerView;
+//        notifyItemInserted(0);
+//    }
 
 }

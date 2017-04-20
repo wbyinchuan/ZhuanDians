@@ -8,7 +8,7 @@
 
     <com.mikhaellopez.circularimageview.CircularImageView
         android:layout_width="60dp"
-        android:layout_height="61dp"
+        android:layout_height="60dp"
         android:src="@drawable/coupon_item_icon"
         app:civ_border_color="#EEEEEE"
         app:civ_border_width="2dp"
@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         app:srcCompat="@drawable/my_emal"
-        android:id="@+id/imageButton"
+        android:id="@+id/iv_email"
         style="@style/ripple_background"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toTopOf="parent"

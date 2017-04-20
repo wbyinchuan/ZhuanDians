@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:ignore="RtlHardcoded"
     xmlns:tl="http://schemas.android.com/apk/res-auto">
     <ImageView
         android:id="@+id/bt_op_nav"
@@ -11,11 +13,11 @@
         android:layout_marginLeft="12dp"
         android:src="@drawable/user_icon"
         android:clickable="true"
-        style="@style/ripple_background"/>
+        style="@style/ripple_background" />
     <com.flyco.tablayout.SegmentTabLayout
         android:id="@+id/tl_segment"
         android:layout_width="wrap_content"
-        android:layout_height="28dp"
+        android:layout_height="30dp"
         android:layout_gravity="center"
         tl:tl_bar_color="#ffffff"
         tl:tl_indicator_color="@android:color/holo_orange_dark"

@@ -2,35 +2,38 @@ package example.com.zhuandian;
 
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.baronzhang.android.library.adapter.BaseRecyclerViewAdapter;
-import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.Indicators.PagerIndicator;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
+import com.yalantis.phoenix.AutoLoadOnScrollListener;
+import com.yalantis.phoenix.PullToRefreshView;
 
 import java.util.HashMap;
 
-public class ContentFragment extends Fragment {
+public class ContentYhFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
 
     private String mParam1;
-    private View SliderView;
 
-    public ContentFragment() {
+    public ContentYhFragment() {
     }
 
-    public static ContentFragment newInstance(String param1) {
-        ContentFragment fragment = new ContentFragment();
+    public static ContentYhFragment newInstance(String param1) {
+        ContentYhFragment fragment = new ContentYhFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         fragment.setArguments(args);
@@ -48,16 +51,34 @@ public class ContentFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        SliderView = getViewFromId(R.layout.slider_layout,container);
-
         View view= inflater.inflate(R.layout.fragment_content, container, false);
+        initViews(view);
+        return view;
+    }
+
+    private void initViews(View view) {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         MyAdapter myAdapter = new MyAdapter();
         recyclerView.setAdapter(myAdapter);
         myAdapter.setOnItemClickListener((parent, view1, position, id) -> {});
-        return view;
+
+        PullToRefreshView mPullToRefreshView = (PullToRefreshView)view.findViewById(R.id.pull_to_refresh);
+        mPullToRefreshView.setOnRefreshListener(() -> mPullToRefreshView.setRefreshing(false));
+
+        AutoLoadOnScrollListener mAutoLoadListener = new AutoLoadOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int currentPage) {
+                new Handler().postDelayed(() -> {
+                    myAdapter.size += 5;
+                    myAdapter.notifyItemInserted(myAdapter.getItemCount() - 1);
+                    this.setLoading(false);
+                }, 200);
+
+            }
+        };
+        recyclerView.addOnScrollListener(mAutoLoadListener);
     }
 
     private View getViewFromId(@LayoutRes int layout, ViewGroup parent) {
@@ -68,6 +89,8 @@ public class ContentFragment extends Fragment {
 
         private static final int HEADER_TYPE = 0;
         private static final int NORMAL_TYPE = 1;
+
+        public int size = 10;
 
         @Override
         public int getItemViewType(int position) {
@@ -86,10 +109,14 @@ public class ContentFragment extends Fragment {
 
             switch (viewType) {
                 case HEADER_TYPE:
-                    initSlider(SliderView);
-                    return new IViewHolder(new TextView(getContext()));
+                    View slider= initSlider(parent);
+                    return new IViewHolder(slider);
                 case NORMAL_TYPE:
                     View item = getViewFromId(R.layout.item_youhui, parent);
+                    TextView zhekou = (TextView) item.findViewById(R.id.tv_zhekou);
+                    setZheKouText(zhekou);
+                    TextView price = (TextView) item.findViewById(R.id.tv_price);
+                    setPriceText(price);
                     return new IViewHolder(item);
                 default:
                     throw new IllegalArgumentException("");
@@ -97,8 +124,10 @@ public class ContentFragment extends Fragment {
 
         }
 
-        private void initSlider(View view) {
-            SliderLayout sliderLayout = (SliderLayout) view.findViewById(R.id.slider);
+        private View initSlider(ViewGroup parent) {
+            View slider = getViewFromId(R.layout.header_slider, parent);
+            SliderLayout sliderLayout = (SliderLayout) slider.findViewById(R.id.slider);
+
             HashMap<String,Integer> file_maps = new HashMap<>();
             file_maps.put("Hannibal",R.drawable.banner);
             file_maps.put("Big Bang Theory",R.drawable.coupon_item_icon);
@@ -109,10 +138,8 @@ public class ContentFragment extends Fragment {
                 sliderView
                         .description(key)
                         .image(file_maps.get(key))
-                        .setScaleType(BaseSliderView.ScaleType.Fit)
-                        .setOnSliderClickListener(slider -> {
-                            //SliderClick
-                        });
+                        .setScaleType(BaseSliderView.ScaleType.CenterCrop)
+                        .setOnSliderClickListener(null);
 
                 //add your extra information
                 sliderView.bundle(new Bundle());
@@ -121,12 +148,12 @@ public class ContentFragment extends Fragment {
 
                 sliderLayout.addSlider(sliderView);
             }
-            sliderLayout.setPresetTransformer(SliderLayout.Transformer.Accordion);
+            sliderLayout.setPresetTransformer(SliderLayout.Transformer.DepthPage);
             sliderLayout.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-            sliderLayout.setCustomAnimation(new DescriptionAnimation());
+            sliderLayout.setPresentIndcatorShape(PagerIndicator.Shape.Rectangle);
             sliderLayout.setDuration(4000);
             sliderLayout.addOnPageChangeListener(null);
-
+            return slider;
         }
 
         @Override
@@ -136,7 +163,7 @@ public class ContentFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return 10;
+            return size;
         }
 
     }
@@ -145,6 +172,27 @@ public class ContentFragment extends Fragment {
         public IViewHolder(View itemView) {
             super(itemView);
         }
+    }
+
+    private void setZheKouText(TextView textView) {
+
+        String text = "10元抢<font color='#ff8800'>5.5折</font>折扣券";
+        String text1 = "<font color='#ff8800'>";
+        String text2 = "5.5折";
+        String text3 = "</font>折扣券";
+
+        StringBuilder sb = new StringBuilder(text);
+        sb.append(text1);
+        sb.append(text2);
+        sb.append(text3);
+
+        textView.setText(Html.fromHtml(text));
+
+//        textView.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    private void setPriceText(TextView price) {
+        price.setText(Html.fromHtml("<big><big>50</big></big>元"));
     }
 
 

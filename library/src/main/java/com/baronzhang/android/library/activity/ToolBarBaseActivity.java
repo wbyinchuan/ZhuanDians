@@ -22,6 +22,7 @@ public class ToolBarBaseActivity extends BaseActivity {
     public static final int TOOLBAR_VIEW_MATCH   = 3;
 
     protected Toolbar toolbar;
+    protected View toolbarView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,10 +71,15 @@ public class ToolBarBaseActivity extends BaseActivity {
                 break;
             case TOOLBAR_VIEW_MATCH:
                 addViewToGroup(view, R.id.view_group_match);
+                toolbarView = view;
                 break;
             default:
                 throw new IllegalArgumentException("gravity参数不合法");
         }
+    }
+
+    public View getToobarView() {
+        return toolbarView;
     }
 
     private void addViewToGroup(View view, int id) {
